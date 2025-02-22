@@ -3,9 +3,9 @@ const MongoClient = require('mongodb').MongoClient; // MongoDB driver
 const app = express();
 const port = 3000;
 
-// MongoDB connection URL and database name
-const mongoUrl = 'mongodb://myuser:mypassword@aman-mongo-mongodb:27017/mydatabase?authSource=admin'; // Modify with your actual values
-const dbName = 'mydatabase'; // The database name you set in your MongoDB values.yaml
+// MongoDB connection URL and database name   
+const mongoUrl = 'mongodb://aman:password@localhost:27017/amandb?authSource=amandb'; // Full DNS name inside Kubernetes
+const dbName = 'amandb'; // The database name you set in your MongoDB values.yaml
 
 // Middleware to parse incoming JSON requests
 app.use(express.json());
@@ -13,7 +13,7 @@ app.use(express.json());
 // Connect to MongoDB
 let db;
 
-MongoClient.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
+MongoClient.connect(mongoUrl)
   .then(client => {
     db = client.db(dbName); // Assign the MongoDB database
     console.log('Connected to MongoDB');
@@ -30,9 +30,10 @@ app.get('/', (req, res) => {
 // Another route for API (this will now interact with MongoDB)
 app.get('/api', async (req, res) => {
   try {
-    const collection = db.collection('items'); // Access the "items" collection
-    const items = await collection.find().toArray(); // Fetch all documents from the collection
-    res.json(items); // Return the list of items
+    if (!db) throw new Error('Database not connected');
+    const collection = db.collection('items');
+    const items = await collection.find().toArray();
+    res.json(items);
   } catch (err) {
     console.error('Error fetching items:', err);
     res.status(500).json({ message: 'Error fetching items from MongoDB' });
@@ -42,16 +43,14 @@ app.get('/api', async (req, res) => {
 // Route to add data to MongoDB
 app.post('/api/items', async (req, res) => {
   try {
-    const collection = db.collection('items'); // Access the "items" collection
-    const newItem = req.body; // Get the new item data from the request body
-
-    // Insert the new item into the collection
+    if (!db) throw new Error('Database not connected');
+    const collection = db.collection('items');
+    const newItem = req.body;
     await collection.insertOne(newItem);
-
     res.status(201).json({ message: 'Item added successfully', item: newItem });
   } catch (err) {
     console.error('Error adding item:', err);
-    res.status(500).json({ message: 'Error adding item to MongoDB' });
+    res.status(500).json({ message: 'Error adding item to MongoDB', error: err.toString() });
   }
 });
 

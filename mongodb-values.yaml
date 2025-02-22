@@ -17,9 +17,9 @@ persistence:
 auth:
   enabled: true
   rootPassword: my-root-password
-  username: myuser
-  password: mypassword
-  database: mydatabase
+  username: aman
+  password: password
+  database: amandb
 
 replicaSet:
   enabled: false
