@@ -1,0 +1,43 @@
+image:
+  repository: arm64v8/mongo
+  tag: "6.0"                 # Keep latest or specify a version like 6.0.6
+  pullPolicy: IfNotPresent
+
+global:
+  storageClass: standard
+  security:
+    allowInsecureImages: true  # Bypass Bitnamis image validation
+
+persistence:
+  enabled: true
+  storageClass: "standard"
+  size: 8Gi
+  mountPath: /data/db  # Ensure this path matches what MongoDB expects
+
+auth:
+  enabled: true
+  rootPassword: my-root-password
+  username: myuser
+  password: mypassword
+  database: mydatabase
+
+replicaSet:
+  enabled: false
+
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 500m
+  limits:
+    memory: 2Gi
+    cpu: 1
+
+systemLog:
+  destination: file
+  logAppend: true
+  path: /bitnami/mongodb/logs/mongodb.log  # Match new mount path
+
+securityContext:
+  enabled: true
+  runAsUser: 0       # Run as root to avoid permission issues
+  fsGroup: 0         # File system group

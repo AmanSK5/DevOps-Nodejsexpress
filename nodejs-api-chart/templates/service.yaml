@@ -10,6 +10,3 @@ spec:
       port: {{ .Values.service.port }}
       targetPort: {{ .Values.containerPort }}
   type: {{ .Values.service.type }}
-
-  serviceAccount:
-    create: false
