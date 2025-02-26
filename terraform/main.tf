@@ -3,15 +3,15 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "my-aks-resource-group"   # <your-resource-group>
-  location = "East US"                 # <your-location>
+  name     = "devops-aks-resource-group"  # Name of the resource group
+  location = "West Europe"                # Region within Azure
 }
 
 resource "azurerm_kubernetes_cluster" "aks" {
-  name                = "my-aks-cluster"  # <your-cluster-name>
+  name                = "devops-aks-cluster"  
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  dns_prefix          = "myaks"
+  dns_prefix          = "devopsaks"
 
   default_node_pool {
     name       = "default"
