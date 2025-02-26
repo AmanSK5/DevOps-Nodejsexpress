@@ -6,7 +6,7 @@ image:
   pullPolicy: Always  # This ensures the image is pulled every time
 
 service:
-  type: ClusterIP
+  type: LoadBalancer
   port: 3000
 
 containerPort: 3000
