@@ -67,3 +67,31 @@ app.post('/api/items', async (req, res) => {
     res.status(500).json({ message: 'Error adding item to MongoDB', error: err.toString() });
   }
 });
+
+// Route for '/api' to show all items
+app.get('/api', async (req, res) => {
+  try {
+    if (!db) return res.status(500).json({ message: 'Database not connected' });
+
+    const collection = db.collection('items');
+    const items = await collection.find().toArray();
+    res.json(items); // Send all items
+  } catch (err) {
+    console.error('Error fetching items:', err);
+    res.status(500).json({ message: 'Error fetching items from MongoDB' });
+  }
+});
+
+// Route for '/api/list' to show all items
+app.get('/api/list', async (req, res) => {
+  try {
+    if (!db) return res.status(500).json({ message: 'Database not connected' });
+
+    const collection = db.collection('items');
+    const items = await collection.find().toArray();
+    res.json(items); // Send all items
+  } catch (err) {
+    console.error('Error fetching items:', err);
+    res.status(500).json({ message: 'Error fetching items from MongoDB' });
+  }
+});
