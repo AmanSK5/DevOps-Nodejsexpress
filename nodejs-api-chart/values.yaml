@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: nodejs-api
+  repository: ghcr.io/amansk5/nodejs-api
   tag: latest
   pullPolicy: IfNotPresent
 
