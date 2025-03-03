@@ -6,7 +6,7 @@ trigger:
 variables:
   imageName: ghcr.io/amansk5/nodejs-api
   tag: $(Build.BuildId)
-  helmChartPath: ./nodejs-api-chart
+  helmChartPath: nodejs-api-chart
   namespace: nodejs
 
 stages:
@@ -19,19 +19,8 @@ stages:
         steps:
           - checkout: self
 
-          # Optional: Validate Dockerfile exists (make sure filename matches)
-          - script: |
-              echo "Listing root directory..."
-              ls -la
-              echo "Checking for dockerfile..."
-              if [ ! -f dockerfile ]; then
-                echo "ERROR: dockerfile not found!"
-                exit 1
-              fi
-            displayName: Validate Dockerfile exists
-
           - task: Docker@2
-            displayName: Build and Push Docker image
+            displayName: Build Docker image
             inputs:
               command: buildAndPush
               repository: $(imageName)
@@ -53,7 +42,7 @@ stages:
             deploy:
               steps:
                 - task: Kubernetes@1
-                  displayName: Set context
+                  displayName: Set Kubernetes context
                   inputs:
                     connectionType: 'Kubernetes Service Connection'
                     kubernetesServiceEndpoint: 'AKSConnection'
@@ -63,6 +52,13 @@ stages:
                   displayName: Install Helm
                   inputs:
                     helmVersionToInstall: 'latest'
+
+                # Validate Kubernetes context before Helm
+                - script: |
+                    echo "Validating Kubernetes context..."
+                    kubectl config current-context
+                    kubectl get pods -n $(namespace)
+                  displayName: Validate Kubernetes context
 
                 - script: |
                     helm upgrade --install nodejs-api $(helmChartPath) \
