@@ -6,7 +6,7 @@ trigger:
 variables:
   imageName: ghcr.io/amansk5/nodejs-api
   tag: $(Build.BuildId)
-  helmChartPath: devops-nodejsexpress/nodejs-api-chart
+  helmChartPath: nodejs-api-chart
   namespace: nodejs
 
 stages:
@@ -17,20 +17,18 @@ stages:
         pool:
           vmImage: ubuntu-latest
         steps:
-          # Safer checkout pulling full history
           - checkout: self
-            fetchDepth: 0
 
-          # Debug step to confirm files are present
+          # Optional: Validate Dockerfile exists
           - script: |
               echo "Listing root directory..."
               ls -la
               echo "Checking for Dockerfile..."
-              if [ ! -f dockerfile ]; then
-                echo "ERROR: Dockerfile not found!"
+              if [ ! -f "dockerfile" ]; then
+                echo "ERROR: dockerfile not found!"
                 exit 1
               fi
-            displayName: "Validate Dockerfile exists"
+            displayName: "Validate dockerfile exists"
 
           - task: Docker@2
             displayName: Build Docker image
@@ -60,6 +58,15 @@ stages:
                     connectionType: 'Kubernetes Service Connection'
                     kubernetesServiceEndpoint: 'AKSConnection'
                     namespace: $(namespace)
+                    command: get
+                    arguments: nodes
+
+                # Optional: Debug step to verify kubeconfig
+                - script: |
+                    echo "Checking current Kubernetes context..."
+                    kubectl config current-context
+                    kubectl get nodes
+                  displayName: "Verify Kubernetes context"
 
                 - task: HelmInstaller@1
                   displayName: Install Helm
