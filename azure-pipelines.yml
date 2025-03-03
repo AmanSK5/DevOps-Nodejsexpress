@@ -6,7 +6,7 @@ trigger:
 variables:
   imageName: ghcr.io/amansk5/nodejs-api
   tag: $(Build.BuildId)
-  helmChartPath: nodejs-api-chart  # Relative path to Helm chart directory
+  helmChartPath: ./nodejs-api-chart  # Assuming the chart is inside the 'nodejs-api-chart' directory in the repo
   namespace: nodejs
 
 stages:
@@ -41,10 +41,13 @@ stages:
           runOnce:
             deploy:
               steps:
+                # Explicit checkout to ensure the repository is fetched
+                - checkout: self  # Ensure the repository is checked out
+
                 - task: AzureCLI@2
                   displayName: 'Set AKS context'
                   inputs:
-                    azureSubscription: 'AzureSubscriptionConnection'  # AzureRM connection
+                    azureSubscription: 'AzureSubscriptionConnection'  # Use the correct AzureRM service connection
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
@@ -56,12 +59,20 @@ stages:
                     helmVersionToInstall: 'latest'
 
                 - script: |
+                    echo "Validating Kubernetes context..."
+                    kubectl config current-context
+                    kubectl get pods -n $(namespace)
+                  displayName: Validate Kubernetes context
+
+                # Listing files in the repository to check the structure
+                - script: |
                     echo "Listing files in the repository..."
                     ls -R /home/vsts/work/1/s/  # List files in the root of the repository for debugging
                   displayName: 'List all files in the repository'
 
+                # Helm upgrade
                 - script: |
-                    helm upgrade --install nodejs-api ./nodejs-api-chart \
+                    helm upgrade --install nodejs-api $(helmChartPath) \
                       --namespace $(namespace) \
                       --set image.repository=$(imageName) \
                       --set image.tag=$(tag)
