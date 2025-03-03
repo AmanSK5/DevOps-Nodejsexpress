@@ -6,7 +6,7 @@ trigger:
 variables:
   imageName: ghcr.io/amansk5/nodejs-api
   tag: $(Build.BuildId)
-  helmChartPath: ./nodejs-api-chart  # Assuming the chart is inside the 'nodejs-api-chart' directory in the repo
+  helmChartPath: nodejs-api-chart  # Relative path to Helm chart directory
   namespace: nodejs
 
 stages:
@@ -44,7 +44,7 @@ stages:
                 - task: AzureCLI@2
                   displayName: 'Set AKS context'
                   inputs:
-                    azureSubscription: 'AzureSubscriptionConnection'  # Use the correct AzureRM service connection
+                    azureSubscription: 'AzureSubscriptionConnection'  # AzureRM connection
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
@@ -56,13 +56,12 @@ stages:
                     helmVersionToInstall: 'latest'
 
                 - script: |
-                    echo "Validating Kubernetes context..."
-                    kubectl config current-context
-                    kubectl get pods -n $(namespace)
-                  displayName: Validate Kubernetes context
+                    echo "Listing files in the current directory..."
+                    ls -l  # List files to ensure the chart folder is available
+                  displayName: 'List files in current directory'
 
                 - script: |
-                    helm upgrade --install nodejs-api $(helmChartPath) \
+                    helm upgrade --install nodejs-api $(Build.SourcesDirectory)/$(helmChartPath) \
                       --namespace $(namespace) \
                       --set image.repository=$(imageName) \
                       --set image.tag=$(tag)
