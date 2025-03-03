@@ -56,12 +56,12 @@ stages:
                     helmVersionToInstall: 'latest'
 
                 - script: |
-                    echo "Listing files in the current directory..."
-                    ls -l  # List files to ensure the chart folder is available
-                  displayName: 'List files in current directory'
+                    echo "Listing files in the repository..."
+                    ls -R  # List all files and directories for debugging
+                  displayName: 'List all files in the repository'
 
                 - script: |
-                    helm upgrade --install nodejs-api $(Build.SourcesDirectory)/$(helmChartPath) \
+                    helm upgrade --install nodejs-api $(Build.SourcesDirectory)/nodejs-api-chart \
                       --namespace $(namespace) \
                       --set image.repository=$(imageName) \
                       --set image.tag=$(tag)
