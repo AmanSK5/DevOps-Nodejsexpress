@@ -39,7 +39,7 @@ stages:
               repository: $(imageName)
               tags: |
                 $(tag)
-              dockerfile: Dockerfile
+              dockerfile: dockerfile
               containerRegistry: GHCRConnection
 
   - stage: Deploy
