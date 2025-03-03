@@ -44,7 +44,7 @@ stages:
                 - task: AzureCLI@2
                   displayName: 'Set AKS context'
                   inputs:
-                    azureSubscription: 'AKSConnection'
+                    azureSubscription: 'AzureSubscriptionConnection'  # Use the correct AzureRM service connection
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
