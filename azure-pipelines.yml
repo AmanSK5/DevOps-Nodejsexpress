@@ -57,11 +57,11 @@ stages:
 
                 - script: |
                     echo "Listing files in the repository..."
-                    ls -R  # List all files and directories for debugging
+                    ls -R /home/vsts/work/1/s/  # List files in the root of the repository for debugging
                   displayName: 'List all files in the repository'
 
                 - script: |
-                    helm upgrade --install nodejs-api $(Build.SourcesDirectory)/nodejs-api-chart \
+                    helm upgrade --install nodejs-api ./nodejs-api-chart \
                       --namespace $(namespace) \
                       --set image.repository=$(imageName) \
                       --set image.tag=$(tag)
