@@ -41,19 +41,20 @@ stages:
           runOnce:
             deploy:
               steps:
-                - task: Kubernetes@1
-                  displayName: Set Kubernetes context
+                - task: AzureCLI@2
+                  displayName: 'Set AKS context'
                   inputs:
-                    connectionType: 'Kubernetes Service Connection'
-                    kubernetesServiceEndpoint: 'AKSConnection'
-                    namespace: $(namespace)
+                    azureSubscription: 'AKSConnection'
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      az aks get-credentials --resource-group devops-aks-resource-group --name devops-aks-cluster --overwrite-existing
 
                 - task: HelmInstaller@1
                   displayName: Install Helm
                   inputs:
                     helmVersionToInstall: 'latest'
 
-                # Validate Kubernetes context before Helm
                 - script: |
                     echo "Validating Kubernetes context..."
                     kubectl config current-context
