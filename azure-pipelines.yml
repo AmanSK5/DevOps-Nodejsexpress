@@ -6,7 +6,7 @@ trigger:
 variables:
   imageName: ghcr.io/amansk5/nodejs-api
   tag: $(Build.BuildId)
-  helmChartPath: nodejs-api-chart
+  helmChartPath: ./nodejs-api-chart  # Assuming the chart is inside the 'nodejs-api-chart' directory in the repo
   namespace: nodejs
 
 stages:
