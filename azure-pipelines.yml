@@ -56,8 +56,14 @@ stages:
             displayName: "Scan for Secrets"
 
           - script: |
+              echo "Installing Trivy..."
+              mkdir -p $HOME/bin
               curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
-              ./trivy image $(imageName):$(tag)
+              sudo mv ./bin/trivy /usr/local/bin/trivy  # Move to a global location
+              chmod +x /usr/local/bin/trivy  # Ensure it’s executable
+
+              echo "Running Trivy Scan..."
+              trivy image $(imageName):$(tag)
             displayName: "Run Image Vulnerability Scan"
 
           - script: |
