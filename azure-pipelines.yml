@@ -8,6 +8,7 @@ variables:
   tag: $(Build.BuildId)
   helmChartPath: ./nodejs-api-chart
   namespace: nodejs
+  keyVaultName: devopsaks-keyvault
 
 stages:
   - stage: Build
@@ -59,8 +60,8 @@ stages:
               echo "Installing Trivy..."
               mkdir -p $HOME/bin
               curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
-              sudo mv ./bin/trivy /usr/local/bin/trivy  # Move to a global location
-              chmod +x /usr/local/bin/trivy  # Ensure it’s executable
+              sudo mv ./bin/trivy /usr/local/bin/trivy
+              chmod +x /usr/local/bin/trivy
 
               echo "Running Trivy Scan..."
               trivy image $(imageName):$(tag)
@@ -97,16 +98,16 @@ stages:
                   name: FetchSecrets
                   inputs:
                     azureSubscription: 'AzureSubscriptionConnection'
-                    KeyVaultName: 'devopsaks-keyvault'
-                    SecretsFilter: '*'
+                    KeyVaultName: $(keyVaultName)
+                    SecretsFilter: 'DBNAME,MONGOURI,PORT'
 
                 - script: |
-                    echo "Creating Kubernetes Secret from Azure Key Vault"
-                    kubectl delete secret mongodb-secrets --ignore-not-found -n $(namespace)
+                    echo "Creating Kubernetes Secret from Azure Key Vault values..."
+                    kubectl delete secret mongodb-secrets -n $(namespace) --ignore-not-found
                     kubectl create secret generic mongodb-secrets -n $(namespace) \
-                      --from-literal=DBNAME=$(DBNAME) \
-                      --from-literal=MONGOURI=$(MONGOURI) \
-                      --from-literal=PORT=$(PORT)
+                      --from-literal=DBNAME="$(DBNAME)" \
+                      --from-literal=MONGOURI="$(MONGOURI)" \
+                      --from-literal=PORT="$(PORT)"
                   displayName: "Sync Azure Key Vault Secrets to Kubernetes"
 
                 - task: HelmInstaller@1
@@ -131,3 +132,8 @@ stages:
                       --set image.repository=$(imageName) \
                       --set image.tag=$(tag)
                   displayName: Helm Upgrade
+
+                - script: |
+                    echo "Restarting Deployment to apply secrets..."
+                    kubectl rollout restart deployment nodejs-api -n $(namespace)
+                  displayName: Restart Deployment
