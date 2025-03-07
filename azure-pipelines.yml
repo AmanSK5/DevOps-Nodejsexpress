@@ -114,7 +114,7 @@ stages:
                       --namespace $(namespace) \
                       --set image.repository=$(imageName) \
                       --set image.tag=$(tag)
-                  displayName: Helm Upgrade  # Deploys the application with Helm
+                  displayName: Helm Upgrade  # Deploys the application via Helm
 
                 # Uncomment the following step to force a restart after deployment
                 # - script: |
