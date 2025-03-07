@@ -1,43 +1,43 @@
 trigger:
   branches:
     include:
-      - main
+      - main  # Pipeline runs on commits to the main branch
 
+# Global Variables
 variables:
-  imageName: ghcr.io/amansk5/nodejs-api
-  tag: $(Build.BuildId)
-  helmChartPath: ./nodejs-api-chart
-  namespace: nodejs
-  keyVaultName: devopsaks-keyvault
+  imageName: ghcr.io/amansk5/nodejs-api  # Name of the Docker image
+  tag: $(Build.BuildId)  # Unique tag for each build using Azure DevOps build ID
+  helmChartPath: ./nodejs-api-chart  # Path to the Helm chart directory
+  namespace: nodejs  # Kubernetes namespace where the app is deployed
 
 stages:
-  - stage: Build
+  - stage: Build  # Stage 1: Build and Push Docker Image
     displayName: Build and Push Docker Image
     jobs:
       - job: Build
         pool:
-          vmImage: ubuntu-latest
+          vmImage: ubuntu-latest  # Uses Ubuntu as the build agent
         steps:
-          - checkout: self
+          - checkout: self  # Checks out the repository
 
           - task: Docker@2
             displayName: Build Docker image
             inputs:
-              command: buildAndPush
+              command: buildAndPush  # Builds and pushes the image to GHCR
               repository: $(imageName)
               tags: |
                 $(tag)
-              dockerfile: dockerfile
-              containerRegistry: GHCRConnection
+              dockerfile: dockerfile  # Uses the Dockerfile in the root directory
+              containerRegistry: GHCRConnection  # Service connection for GitHub Container Registry
 
-  - stage: Secure
+  - stage: Secure  # Stage 2: Security Scans
     displayName: Security Scans
     jobs:
       - job: LintAndScan
         pool:
-          vmImage: ubuntu-latest
+          vmImage: ubuntu-latest  # Uses Ubuntu as the build agent
         steps:
-          - checkout: self
+          - checkout: self  # Ensures the repo is checked out
 
           - script: |
               echo "Checking repo structure..."
@@ -59,10 +59,9 @@ stages:
           - script: |
               echo "Installing Trivy..."
               mkdir -p $HOME/bin
-              curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
-              sudo mv ./bin/trivy /usr/local/bin/trivy
-              chmod +x /usr/local/bin/trivy
-
+              curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh 
+              sudo mv ./bin/trivy /usr/local/bin/trivy 
+              chmod +x /usr/local/bin/trivy   
               echo "Running Trivy Scan..."
               trivy image $(imageName):$(tag)
             displayName: "Run Image Vulnerability Scan"
@@ -71,44 +70,28 @@ stages:
               docker pull $(imageName):$(tag)
             displayName: "Validate GHCR Image Access"
 
-  - stage: Deploy
+  - stage: Deploy  # Stage 3: Deploy to AKS
     displayName: Deploy to AKS
-    dependsOn: [Build, Secure]
+    dependsOn: [Build, Secure]  # Deploy only if Build & Secure stages succeed
     jobs:
       - deployment: DeployToAKS
-        environment: aks-nodejs
+        environment: aks-nodejs  # Uses Azure DevOps environment for AKS
         pool:
           vmImage: ubuntu-latest
         strategy:
           runOnce:
             deploy:
               steps:
-                - checkout: self
+                - checkout: self  # Ensure repo is checked out
 
                 - task: AzureCLI@2
                   displayName: 'Set AKS context'
                   inputs:
-                    azureSubscription: 'AzureSubscriptionConnection'
+                    azureSubscription: 'AzureSubscriptionConnection'  # Azure DevOps service connection
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
                       az aks get-credentials --resource-group devops-aks-resource-group --name devops-aks-cluster --overwrite-existing
-
-                - task: AzureKeyVault@2
-                  name: FetchSecrets
-                  inputs:
-                    azureSubscription: 'AzureSubscriptionConnection'
-                    KeyVaultName: $(keyVaultName)
-                    SecretsFilter: 'DBNAME,MONGOURI,PORT'
-
-                - script: |
-                    echo "Creating Kubernetes Secret from Azure Key Vault values..."
-                    kubectl delete secret mongodb-secrets -n $(namespace) --ignore-not-found
-                    kubectl create secret generic mongodb-secrets -n $(namespace) \
-                      --from-literal=DBNAME="$(DBNAME)" \
-                      --from-literal=MONGOURI="$(MONGOURI)" \
-                      --from-literal=PORT="$(PORT)"
-                  displayName: "Sync Azure Key Vault Secrets to Kubernetes"
 
                 - task: HelmInstaller@1
                   displayName: Install Helm
@@ -131,9 +114,13 @@ stages:
                       --namespace $(namespace) \
                       --set image.repository=$(imageName) \
                       --set image.tag=$(tag)
-                  displayName: Helm Upgrade
+                  displayName: Helm Upgrade  # Deploys the application with Helm
+
+                # Uncomment the following step to force a restart after deployment
+                # - script: |
+                #     kubectl rollout restart deployment/nodejs-api -n $(namespace)
+                #   displayName: Restart Deployment (Optional)
 
                 - script: |
-                    echo "Restarting Deployment to apply secrets..."
-                    kubectl rollout restart deployment nodejs-api -n $(namespace)
-                  displayName: Restart Deployment
+                    echo "Deployment completed successfully."
+                  displayName: Deployment Confirmation
