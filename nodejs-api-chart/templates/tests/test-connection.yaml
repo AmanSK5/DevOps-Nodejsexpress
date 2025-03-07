@@ -9,7 +9,18 @@ metadata:
 spec:
   containers:
     - name: wget
-      image: busybox
+      image: busybox:1.34  # <-- No more "latest"
       command: ['wget']
-      args: ['{{ include "nodejs-api-chart.fullname" . }}:{{ .Values.service.port }}']
+      args: ['-O-', 'http://{{ include "nodejs-api-chart.fullname" . }}:{{ .Values.service.port }}']
+      securityContext:
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+      resources:
+        requests:
+          cpu: "50m"
+          memory: "64Mi"
+        limits:
+          cpu: "200m"
+          memory: "128Mi"
   restartPolicy: Never

@@ -2,13 +2,13 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/amansk5/nodejs-api
-  tag: "{{ .Values.image.tag }}"
+  tag: "{{ .Chart.AppVersion }}"  # Uses Helm's Chart versioning
   pullPolicy: Always  # Ensures the image is always pulled
 
 env:
-  DBNAME: ""
-  MONGOURI: ""
-  PORT: ""
+  DBNAME: "{{ .Values.env.DBNAME }}"
+  MONGOURI: "{{ .Values.env.MONGOURI }}"
+  PORT: "{{ .Values.env.PORT }}"
 
 resources:
   requests:
@@ -23,6 +23,11 @@ service:
   port: 3000
 
 containerPort: 3000
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  readOnlyRootFilesystem: true
 
 serviceAccount:
   create: false
@@ -43,3 +48,7 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 5
   targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
