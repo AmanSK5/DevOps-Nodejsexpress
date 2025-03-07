@@ -2,8 +2,21 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/amansk5/nodejs-api
-  tag: latest
-  pullPolicy: Always
+  tag: "{{ .Values.image.tag }}"
+  pullPolicy: Always  # Ensures the image is always pulled
+
+env:
+  DBNAME: ""
+  MONGOURI: ""
+  PORT: ""
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "500m"
+    memory: "256Mi"
 
 service:
   type: LoadBalancer
@@ -14,13 +27,8 @@ containerPort: 3000
 serviceAccount:
   create: false
 
-env:
-  DBNAME: ""
-  MONGOURI: ""
-  PORT: ""
-
 ingress:
-  enabled: false
+  enabled: false  # Change to true if you want to enable ingress
   className: "nginx"
   annotations: {}
   hosts:
@@ -31,7 +39,7 @@ ingress:
   tls: []
 
 autoscaling:
-  enabled: false
+  enabled: false  # Change to true if you want HPA
   minReplicas: 1
   maxReplicas: 5
   targetCPUUtilizationPercentage: 80

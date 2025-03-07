@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: nodejs-api
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: nodejs-api
@@ -15,8 +15,9 @@ spec:
       containers:
         - name: nodejs-api
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 3000
+            - containerPort: {{ .Values.containerPort }}
           env:
             - name: DB_NAME
               value: "{{ .Values.env.DBNAME }}"
@@ -24,3 +25,14 @@ spec:
               value: "{{ .Values.env.MONGOURI }}"
             - name: PORT
               value: "{{ .Values.env.PORT }}"
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          resources:
+            requests:
+              cpu: "{{ .Values.resources.requests.cpu }}"
+              memory: "{{ .Values.resources.requests.memory }}"
+            limits:
+              cpu: "{{ .Values.resources.limits.cpu }}"
+              memory: "{{ .Values.resources.limits.memory }}"

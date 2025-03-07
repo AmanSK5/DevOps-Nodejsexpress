@@ -38,7 +38,6 @@ stages:
         steps:
           - checkout: self
 
-          # Debug Step - List files in repo to confirm correct Helm directory
           - script: |
               echo "Checking repo structure..."
               ls -R /home/vsts/work/1/s/
