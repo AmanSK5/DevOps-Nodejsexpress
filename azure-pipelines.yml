@@ -8,9 +8,6 @@ variables:
   tag: $(Build.BuildId)
   helmChartPath: ./nodejs-api-chart
   namespace: nodejs
-  DBNAME: ''
-  MONGOURI: ''
-  PORT: ''
 
 stages:
   - stage: Build
@@ -42,8 +39,10 @@ stages:
           - checkout: self
 
           - script: |
-              npm install -g kube-linter
-              kube-linter lint ./helm
+              curl -sLo kube-linter.tar.gz https://github.com/stackrox/kube-linter/releases/download/v0.6.6/kube-linter-linux.tar.gz
+              tar -xzf kube-linter.tar.gz
+              chmod +x kube-linter
+              ./kube-linter lint ./helm
             displayName: "Lint Kubernetes Manifests"
 
           - script: |
