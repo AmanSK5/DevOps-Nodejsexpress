@@ -100,6 +100,15 @@ stages:
                     KeyVaultName: 'devopsaks-keyvault'
                     SecretsFilter: '*'
 
+                - script: |
+                    echo "Creating Kubernetes Secret from Azure Key Vault"
+                    kubectl delete secret mongodb-secrets --ignore-not-found -n $(namespace)
+                    kubectl create secret generic mongodb-secrets -n $(namespace) \
+                      --from-literal=DBNAME=$(DBNAME) \
+                      --from-literal=MONGOURI=$(MONGOURI) \
+                      --from-literal=PORT=$(PORT)
+                  displayName: "Sync Azure Key Vault Secrets to Kubernetes"
+
                 - task: HelmInstaller@1
                   displayName: Install Helm
                   inputs:
@@ -120,8 +129,5 @@ stages:
                     helm upgrade --install nodejs-api $(helmChartPath) \
                       --namespace $(namespace) \
                       --set image.repository=$(imageName) \
-                      --set image.tag=$(tag) \
-                      --set env.DBNAME=$(DBNAME) \
-                      --set env.MONGOURI=$(MONGOURI) \
-                      --set env.PORT=$(PORT)
+                      --set image.tag=$(tag)
                   displayName: Helm Upgrade

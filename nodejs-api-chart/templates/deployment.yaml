@@ -19,12 +19,21 @@ spec:
           ports:
             - containerPort: {{ .Values.containerPort }}
           env:
-            - name: DB_NAME
-              value: "{{ .Values.env.DBNAME }}"
-            - name: MONGO_URI
-              value: "{{ .Values.env.MONGOURI }}"
+            - name: DBNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secrets
+                  key: DBNAME
+            - name: MONGOURI
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secrets
+                  key: MONGOURI
             - name: PORT
-              value: "{{ .Values.env.PORT }}"
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secrets
+                  key: PORT
           securityContext:
             readOnlyRootFilesystem: true
             runAsNonRoot: true

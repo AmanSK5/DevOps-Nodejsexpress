@@ -5,11 +5,6 @@ image:
   tag: "{{ .Chart.AppVersion }}"  # Uses Helm's Chart versioning
   pullPolicy: Always  # Ensures the image is always pulled
 
-env:
-  DBNAME: "{{ .Values.env.DBNAME }}"
-  MONGOURI: "{{ .Values.env.MONGOURI }}"
-  PORT: "{{ .Values.env.PORT }}"
-
 resources:
   requests:
     cpu: "100m"
