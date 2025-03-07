@@ -1,12 +1,12 @@
 trigger:
   branches:
     include:
-      - main  
+      - main
 
 variables:
   imageName: ghcr.io/amansk5/nodejs-api
   tag: $(Build.BuildId)
-  helmChartPath: ./nodejs-api-chart  # Assuming the chart is inside the 'nodejs-api-chart' directory in the repo
+  helmChartPath: ./nodejs-api-chart
   namespace: nodejs
 
 stages:
@@ -29,9 +29,37 @@ stages:
               dockerfile: dockerfile
               containerRegistry: GHCRConnection
 
+  - stage: Secure
+    displayName: Security Scans
+    jobs:
+      - job: LintAndScan
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - checkout: self
+
+          - script: |
+              npm install -g kube-linter
+              kube-linter lint ./helm
+            displayName: "Lint Kubernetes Manifests"
+
+          - script: |
+              npm install -g git-secrets
+              git secrets --scan
+            displayName: "Scan for Secrets"
+
+          - script: |
+              curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+              ./trivy image $(imageName):$(tag)
+            displayName: "Run Image Vulnerability Scan"
+
+          - script: |
+              docker pull $(imageName):$(tag)
+            displayName: "Validate GHCR Image Access"
+
   - stage: Deploy
     displayName: Deploy to AKS
-    dependsOn: Build
+    dependsOn: [Build, Secure]
     jobs:
       - deployment: DeployToAKS
         environment: aks-nodejs
@@ -41,17 +69,23 @@ stages:
           runOnce:
             deploy:
               steps:
-                # Explicit checkout to ensure the repository is fetched
-                - checkout: self  # Ensure the repository is checked out
+                - checkout: self
 
                 - task: AzureCLI@2
                   displayName: 'Set AKS context'
                   inputs:
-                    azureSubscription: 'AzureSubscriptionConnection'  # Use the correct AzureRM service connection
+                    azureSubscription: 'AzureSubscriptionConnection'
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
                       az aks get-credentials --resource-group devops-aks-resource-group --name devops-aks-cluster --overwrite-existing
+
+                - task: AzureKeyVault@2
+                  name: FetchSecrets
+                  inputs:
+                    azureSubscription: 'AzureSubscriptionConnection'
+                    KeyVaultName: 'devopsaks-keyvault'
+                    SecretsFilter: '*'
 
                 - task: HelmInstaller@1
                   displayName: Install Helm
@@ -64,16 +98,17 @@ stages:
                     kubectl get pods -n $(namespace)
                   displayName: Validate Kubernetes context
 
-                # Listing files in the repository to check the structure
                 - script: |
                     echo "Listing files in the repository..."
-                    ls -R /home/vsts/work/1/s/  # List files in the root of the repository for debugging
+                    ls -R /home/vsts/work/1/s/
                   displayName: 'List all files in the repository'
 
-                # Helm upgrade
                 - script: |
                     helm upgrade --install nodejs-api $(helmChartPath) \
                       --namespace $(namespace) \
                       --set image.repository=$(imageName) \
-                      --set image.tag=$(tag)
+                      --set image.tag=$(tag) \
+                      --set env.DBNAME=$(DBNAME) \
+                      --set env.MONGOURI=$(MONGOURI) \
+                      --set env.PORT=$(PORT)
                   displayName: Helm Upgrade

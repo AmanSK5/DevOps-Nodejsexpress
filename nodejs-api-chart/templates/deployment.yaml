@@ -16,5 +16,12 @@ spec:
         - name: nodejs-api
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: DBNAME
+              value: "{{ .Values.env.DBNAME }}"
+            - name: MONGOURI
+              value: "{{ .Values.env.MONGOURI }}"
+            - name: PORT
+              value: "{{ .Values.env.PORT }}"
           ports:
             - containerPort: {{ .Values.containerPort }}

@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const { MongoClient } = require('mongodb');
 
@@ -6,8 +5,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // MongoDB connection details from .env
-const mongoUrl = process.env.MONGO_URI;
-const dbName = process.env.DB_NAME;
+const mongoUrl = process.env.MONGOURI;
+const dbName = process.env.DBNAME;
 
 // Middleware to parse incoming JSON requests
 app.use(express.json());
