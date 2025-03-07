@@ -8,6 +8,9 @@ variables:
   tag: $(Build.BuildId)
   helmChartPath: ./nodejs-api-chart
   namespace: nodejs
+  DBNAME: ''
+  MONGOURI: ''
+  PORT: ''
 
 stages:
   - stage: Build
