@@ -38,11 +38,17 @@ stages:
         steps:
           - checkout: self
 
+          # Debug Step - List files in repo to confirm correct Helm directory
+          - script: |
+              echo "Checking repo structure..."
+              ls -R /home/vsts/work/1/s/
+            displayName: "List all repo files"
+
           - script: |
               curl -sLo kube-linter.tar.gz https://github.com/stackrox/kube-linter/releases/download/v0.6.6/kube-linter-linux.tar.gz
               tar -xzf kube-linter.tar.gz
               chmod +x kube-linter
-              ./kube-linter lint ./helm
+              ./kube-linter lint ./nodejs-api-chart
             displayName: "Lint Kubernetes Manifests"
 
           - script: |
