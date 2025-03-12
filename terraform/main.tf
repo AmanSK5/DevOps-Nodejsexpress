@@ -78,11 +78,11 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   api_server_access_profile {
-    private_cluster_enabled = true  # Updated field
-    private_dns_zone        = "System" # Uses default private DNS management
+    private_cluster_enabled = true  # Corrected field
+    private_dns_zone_id     = azurerm_private_dns_zone.aks_dns.id  # Use manually created DNS zone
   }
 
-  monitoring_profile {
+  oms_agent {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
   }
 
