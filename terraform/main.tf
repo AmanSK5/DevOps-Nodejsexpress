@@ -83,7 +83,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   # Private API Server Configuration
   api_server_access_profile {
-    enable_private_cluster = true  # Correct field name for Terraform v3.70
+    private_cluster_enabled = true  # Correct field for Terraform v3.70
   }
 
 
