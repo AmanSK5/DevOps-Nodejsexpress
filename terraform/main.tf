@@ -81,10 +81,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.0.0.10"
   }
 
-  # enable a private AKS cluster in Terraform v3.70
+  # ✅ Correct way to enable a private AKS cluster in Terraform v3.70.0
   api_server_access_profile {
-    enable_private_cluster = true
-    private_dns_zone       = "System" # Use Azure's default private DNS zone management
+    private_cluster_enabled = true
   }
 
   oms_agent {
