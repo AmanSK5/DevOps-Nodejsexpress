@@ -81,11 +81,11 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.0.0.10"
   }
 
-  # Private API Server Configuration
+  # enable a private AKS cluster in Terraform v3.70
   api_server_access_profile {
-    private_cluster_enabled = true  # Correct field for Terraform v3.70
+    enable_private_cluster = true
+    private_dns_zone       = "System" # Use Azure's default private DNS zone management
   }
-
 
   oms_agent {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
