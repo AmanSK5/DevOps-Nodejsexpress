@@ -47,20 +47,6 @@ resource "azurerm_subnet" "aks_subnet" {
   }
 }
 
-# ✅ Private DNS Zone for AKS API
-resource "azurerm_private_dns_zone" "aks_dns" {
-  name                = "privatelink.westeurope.azmk8s.io"
-  resource_group_name = azurerm_resource_group.rg.name
-}
-
-# ✅ Private DNS Link to VNet
-resource "azurerm_private_dns_zone_virtual_network_link" "aks_dns_link" {
-  name                  = "aks-dns-link"
-  resource_group_name   = azurerm_resource_group.rg.name
-  private_dns_zone_name = azurerm_private_dns_zone.aks_dns.name
-  virtual_network_id    = azurerm_virtual_network.vnet.id
-}
-
 # ✅ Log Analytics for AKS Monitoring
 resource "azurerm_log_analytics_workspace" "aks" {
   name                = "aks-log-workspace"
@@ -70,7 +56,7 @@ resource "azurerm_log_analytics_workspace" "aks" {
   retention_in_days   = 30
 }
 
-# ✅ AKS Private Cluster (Corrected for Terraform v3.70)
+# ✅ AKS Private Cluster (Fixed for v3.70.0)
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location
@@ -95,10 +81,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.0.0.10"
   }
 
-  # ✅ Corrected for Terraform v3.70
-  api_server_access_profile {
-    enable_private_cluster = true  # ✅ Correct field for v3.70
-  }
+  # ✅ Corrected for Terraform v3.70.0
+  private_cluster_enabled = true  # ✅ Correct field for v3.70.0
 
   oms_agent {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
@@ -110,10 +94,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
     environment = "dev"
   }
 
-  # ✅ Ensure DNS and Monitoring are created first
+  # ✅ Ensure Monitoring is created first
   depends_on = [
-    azurerm_private_dns_zone.aks_dns,
-    azurerm_private_dns_zone_virtual_network_link.aks_dns_link,
     azurerm_log_analytics_workspace.aks
   ]
 }
