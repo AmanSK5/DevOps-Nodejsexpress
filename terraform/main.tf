@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.22.0"  # ✅ Ensuring compatibility
+      version = "~> 4.22.0"
     }
   }
 }
@@ -13,7 +13,7 @@ provider "azurerm" {
   features {}
 }
 
-# Create a Resource Group
+# ✅ Create a Resource Group
 resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
   location = var.location
@@ -38,27 +38,13 @@ resource "azurerm_subnet" "aks_subnet" {
   delegation {
     name = "aksdelegation"
     service_delegation {
-      name = "Microsoft.ContainerService/managedClusters"
+      name    = "Microsoft.ContainerService/managedClusters"
       actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
     }
   }
 }
 
-# ✅ Create Private DNS Zone for AKS API
-resource "azurerm_private_dns_zone" "aks_dns" {
-  name                = "privatelink.${var.location}.azmk8s.io"
-  resource_group_name = azurerm_resource_group.rg.name
-}
-
-# ✅ Link Private DNS Zone to VNet
-resource "azurerm_private_dns_zone_virtual_network_link" "aks_dns_link" {
-  name                  = "aks-dns-link"
-  resource_group_name   = azurerm_resource_group.rg.name
-  private_dns_zone_name = azurerm_private_dns_zone.aks_dns.name
-  virtual_network_id    = azurerm_virtual_network.vnet.id
-}
-
-# ✅ AKS Private Cluster with Correct Private API Config
+# ✅ Create a Private AKS Cluster
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location
@@ -78,15 +64,14 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   network_profile {
     network_plugin = "azure"
-    network_policy = "calico" 
+    network_policy = "calico"
     service_cidr   = "10.0.0.0/16"
     dns_service_ip = "10.0.0.10"
   }
 
-  # ✅ Correct way to define a Private AKS Cluster in Terraform v4.22.0
+  # ✅ Correct field for Terraform v4.22.0 (Fixes previous errors)
   api_server_access_profile {
-    private_cluster_enabled = true  # ✅ Correct field name
-    private_dns_zone_id     = azurerm_private_dns_zone.aks_dns.id
+    enable_private_cluster = true
   }
 
   role_based_access_control_enabled = true
@@ -94,8 +79,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
   tags = {
     environment = "dev"
   }
-
-  depends_on = [azurerm_private_dns_zone.aks_dns]
 }
 
 output "aks_name" {
