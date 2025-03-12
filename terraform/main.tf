@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.0.1"  # Ensure Terraform pulls the correct provider
+      version = "~> 4.22.0"  # ✅ Latest azurerm version
     }
   }
 }
@@ -19,40 +19,29 @@ resource "azurerm_resource_group" "rg" {
   location = var.location
 }
 
-# Create a Virtual Network
+# ✅ Create a Virtual Network for Private AKS
 resource "azurerm_virtual_network" "vnet" {
-  name                = var.vnet_name
+  name                = "aks-vnet"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  address_space       = var.vnet_address_space
+  address_space       = ["10.0.0.0/16"]
 }
 
-# Create a Subnet for AKS
+# ✅ Create a Subnet for AKS
 resource "azurerm_subnet" "aks_subnet" {
-  name                 = var.subnet_name
+  name                 = "aks-subnet"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = var.subnet_address_prefix
+  address_prefixes     = ["10.0.1.0/24"]
 
+  # Required for Private AKS clusters
   delegation {
     name = "aksdelegation"
-
     service_delegation {
       name = "Microsoft.ContainerService/managedClusters"
-      actions = [
-        "Microsoft.Network/virtualNetworks/subnets/join/action"
-      ]
+      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
     }
   }
-}
-
-# Log Analytics Workspace
-resource "azurerm_log_analytics_workspace" "aks" {
-  name                = "aks-log-workspace"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
 }
 
 # ✅ Create Private DNS Zone for AKS API
@@ -69,12 +58,12 @@ resource "azurerm_private_dns_zone_virtual_network_link" "aks_dns_link" {
   virtual_network_id    = azurerm_virtual_network.vnet.id
 }
 
-# ✅ Private AKS Cluster Configuration (Terraform 4.x.x)
+# ✅ AKS Private Cluster with Private API
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  dns_prefix          = "devopsaks-private"
+  dns_prefix          = "devopsaks"
 
   default_node_pool {
     name           = "default"
@@ -89,19 +78,15 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   network_profile {
     network_plugin = "azure"
-    network_policy = "calico"
+    network_policy = "calico" 
     service_cidr   = "10.0.0.0/16"
     dns_service_ip = "10.0.0.10"
   }
 
-  # ✅ Correct way to enable a private AKS cluster in Terraform v4.x.x
+  # ✅ Correct Private API Server Configuration for azurerm v4.22.0
   api_server_access_profile {
-    private_cluster_enabled = true
-    private_dns_zone_id     = azurerm_private_dns_zone.aks_dns.id
-  }
-
-  oms_agent {
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
+    enable_private_cluster = true  # ✅ Correct field for Terraform v4.22.0
+    private_dns_zone_id    = azurerm_private_dns_zone.aks_dns.id
   }
 
   role_based_access_control_enabled = true
@@ -110,10 +95,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     environment = "dev"
   }
 
-  depends_on = [
-    azurerm_log_analytics_workspace.aks,
-    azurerm_private_dns_zone.aks_dns
-  ]
+  depends_on = [azurerm_private_dns_zone.aks_dns]
 }
 
 output "aks_name" {
