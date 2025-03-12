@@ -74,8 +74,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.0.0.10"
   }
 
-  private_cluster_enabled = true  # Moved out of `api_server_access_profile`
-  private_dns_zone        = "System"  # Use the default managed DNS
+  api_server_access_profile {
+    enable_private_cluster = true
+    private_dns_zone       = "System"  # Use the default managed DNS
+  }
 
   oms_agent {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
