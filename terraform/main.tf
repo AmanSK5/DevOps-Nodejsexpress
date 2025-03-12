@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.70.0"  
+      version = "~> 3.70.0"
     }
   }
 }
@@ -34,7 +34,6 @@ resource "azurerm_subnet" "aks_subnet" {
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = var.subnet_address_prefix
 
-  # Required for Private AKS clusters
   delegation {
     name = "aksdelegation"
 
@@ -47,6 +46,20 @@ resource "azurerm_subnet" "aks_subnet" {
   }
 }
 
+# Private DNS Zone for Private AKS Cluster
+resource "azurerm_private_dns_zone" "aks_dns" {
+  name                = var.private_dns_zone_name
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+# Link DNS Zone to Virtual Network
+resource "azurerm_private_dns_zone_virtual_network_link" "aks_dns_link" {
+  name                  = "aks-dns-link"
+  resource_group_name   = azurerm_resource_group.rg.name
+  private_dns_zone_name = azurerm_private_dns_zone.aks_dns.name
+  virtual_network_id    = azurerm_virtual_network.vnet.id
+}
+
 # Log Analytics Workspace
 resource "azurerm_log_analytics_workspace" "aks" {
   name                = "aks-log-workspace"
@@ -56,7 +69,7 @@ resource "azurerm_log_analytics_workspace" "aks" {
   retention_in_days   = 30
 }
 
-# AKS Private Cluster with System-Managed Private DNS
+# AKS Private Cluster (Fixed for Terraform v3.70.0)
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location
@@ -76,14 +89,14 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   network_profile {
     network_plugin = "azure"
-    network_policy = "calico" 
+    network_policy = "calico"
     service_cidr   = "10.0.0.0/16"
     dns_service_ip = "10.0.0.10"
   }
 
-  # ✅ Correct API Server Profile for Terraform v3.70.0
+  # ✅ Correct way for Private AKS in Terraform v3.70.0
   api_server_access_profile {
-    private_cluster_enabled = true  # ✅ Correct field for Terraform v3.70.0
+    private_dns_zone_id = azurerm_private_dns_zone.aks_dns.id
   }
 
   oms_agent {
@@ -96,7 +109,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     environment = "dev"
   }
 
-  depends_on = [azurerm_log_analytics_workspace.aks]
+  depends_on = [
+    azurerm_log_analytics_workspace.aks,
+    azurerm_private_dns_zone.aks_dns
+  ]
 }
 
 output "aks_name" {
