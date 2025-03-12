@@ -4,38 +4,42 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.70.0"  # Ensure Terraform pulls a supported version
+      version = "~> 3.70.0"  
     }
   }
 }
 
 provider "azurerm" {
   features {}
-  skip_provider_registration = true  # ✅ Prevents Terraform from failing due to missing providers
+
+  # Allow resource group deletion even if resources remain
+  resource_group {
+    prevent_deletion_if_contains_resources = false
+  }
 }
 
-# Resource Group
+# Create a Resource Group
 resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
   location = var.location
 }
 
-# Virtual Network for AKS
+# Create a Virtual Network
 resource "azurerm_virtual_network" "vnet" {
-  name                = "aks-vnet"
+  name                = var.vnet_name
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  address_space       = ["10.0.0.0/16"]
+  address_space       = var.vnet_address_space
 }
 
-# Subnet for AKS Nodes
+# Create a Subnet for AKS
 resource "azurerm_subnet" "aks_subnet" {
-  name                 = "aks-subnet"
+  name                 = var.subnet_name
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.1.0/24"]
+  address_prefixes     = var.subnet_address_prefix
 
-  # Required for AKS Private Link
+  # Required for Private AKS clusters
   delegation {
     name = "aksdelegation"
 
@@ -48,7 +52,7 @@ resource "azurerm_subnet" "aks_subnet" {
   }
 }
 
-# ✅ Log Analytics for AKS Monitoring
+# Log Analytics Workspace
 resource "azurerm_log_analytics_workspace" "aks" {
   name                = "aks-log-workspace"
   location            = azurerm_resource_group.rg.location
@@ -57,12 +61,12 @@ resource "azurerm_log_analytics_workspace" "aks" {
   retention_in_days   = 30
 }
 
-# ✅ AKS Private Cluster (Fixed for v3.70.0)
+# AKS Private Cluster with System-Managed Private DNS
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  dns_prefix          = "devopsaks"
+  dns_prefix          = "devopsaks-private"
 
   default_node_pool {
     name           = "default"
@@ -77,13 +81,16 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   network_profile {
     network_plugin = "azure"
-    network_policy = "calico" # Security best practice
+    network_policy = "calico" 
     service_cidr   = "10.0.0.0/16"
     dns_service_ip = "10.0.0.10"
   }
 
-  # ✅ Corrected for Terraform v3.70.0
-  private_cluster_enabled = true  # ✅ Correct field for v3.70.0
+  # Private API Server Configuration
+  api_server_access_profile {
+    private_cluster_enabled = true
+    private_dns_zone_mode   = var.private_dns_zone_mode  
+  }
 
   oms_agent {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
@@ -95,13 +102,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
     environment = "dev"
   }
 
-  # ✅ Ensure Monitoring is created first
-  depends_on = [
-    azurerm_log_analytics_workspace.aks
-  ]
+  depends_on = [azurerm_log_analytics_workspace.aks]
 }
 
-# ✅ Output the AKS Cluster Name
 output "aks_name" {
   value = azurerm_kubernetes_cluster.aks.name
 }
