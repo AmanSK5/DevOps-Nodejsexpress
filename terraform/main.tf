@@ -8,16 +8,18 @@ terraform {
     }
   }
 }
+
 provider "azurerm" {
   features {}
 }
 
+# Resource Group
 resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
   location = var.location
 }
 
-# Create a Virtual Network
+# Virtual Network for AKS
 resource "azurerm_virtual_network" "vnet" {
   name                = "aks-vnet"
   location            = azurerm_resource_group.rg.location
@@ -25,14 +27,14 @@ resource "azurerm_virtual_network" "vnet" {
   address_space       = ["10.0.0.0/16"]
 }
 
-# Create Subnets
+# Subnet for AKS Nodes
 resource "azurerm_subnet" "aks_subnet" {
   name                 = "aks-subnet"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
 
-  # Required for Private AKS clusters
+  # Required for AKS Private Link
   delegation {
     name = "aksdelegation"
 
@@ -45,7 +47,21 @@ resource "azurerm_subnet" "aks_subnet" {
   }
 }
 
-# Log Analytics for AKS Monitoring (must be created before AKS)
+# ✅ Private DNS Zone for AKS API
+resource "azurerm_private_dns_zone" "aks_dns" {
+  name                = "privatelink.westeurope.azmk8s.io"
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+# ✅ Private DNS Link to VNet
+resource "azurerm_private_dns_zone_virtual_network_link" "aks_dns_link" {
+  name                  = "aks-dns-link"
+  resource_group_name   = azurerm_resource_group.rg.name
+  private_dns_zone_name = azurerm_private_dns_zone.aks_dns.name
+  virtual_network_id    = azurerm_virtual_network.vnet.id
+}
+
+# ✅ Log Analytics for AKS Monitoring
 resource "azurerm_log_analytics_workspace" "aks" {
   name                = "aks-log-workspace"
   location            = azurerm_resource_group.rg.location
@@ -54,7 +70,7 @@ resource "azurerm_log_analytics_workspace" "aks" {
   retention_in_days   = 30
 }
 
-# AKS Cluster with Private Link
+# ✅ AKS Private Cluster
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location
@@ -65,7 +81,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     name           = "default"
     node_count     = var.node_count
     vm_size        = var.vm_size
-    vnet_subnet_id = azurerm_subnet.aks_subnet.id  # Assign the subnet
+    vnet_subnet_id = azurerm_subnet.aks_subnet.id
   }
 
   identity {
@@ -74,14 +90,15 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   network_profile {
     network_plugin = "azure"
-    network_policy = "calico" # Improves security
+    network_policy = "calico" # Security best practice
     service_cidr   = "10.0.0.0/16"
     dns_service_ip = "10.0.0.10"
   }
 
-  # Correct way to enable a private AKS cluster
+  # ✅ Private Cluster Enabled Correctly
   api_server_access_profile {
-    private_cluster_enabled = true
+    enable_private_cluster = true
+    private_dns_zone_id    = azurerm_private_dns_zone.aks_dns.id
   }
 
   oms_agent {
@@ -94,9 +111,15 @@ resource "azurerm_kubernetes_cluster" "aks" {
     environment = "dev"
   }
 
-  depends_on = [azurerm_log_analytics_workspace.aks]
+  # ✅ Ensure DNS and Monitoring are created first
+  depends_on = [
+    azurerm_private_dns_zone.aks_dns,
+    azurerm_private_dns_zone_virtual_network_link.aks_dns_link,
+    azurerm_log_analytics_workspace.aks
+  ]
 }
 
+# ✅ Output the AKS Cluster Name
 output "aks_name" {
   value = azurerm_kubernetes_cluster.aks.name
 }
