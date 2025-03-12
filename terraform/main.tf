@@ -75,10 +75,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   # Private Cluster Configuration
-  api_server_access_profile {
-    enable_private_cluster = true
-    private_dns_zone_id    = azurerm_private_dns_zone.aks_dns.id
-  }
+  private_cluster_enabled = true
+  private_dns_zone        = "System"  # Uses Azure default private DNS
 
   oms_agent {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
