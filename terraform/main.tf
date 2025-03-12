@@ -83,9 +83,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   # Private API Server Configuration
   api_server_access_profile {
-    private_cluster_enabled = true
-    private_dns_zone_mode   = var.private_dns_zone_mode  
+    enable_private_cluster = true  # Correct field name for Terraform v3.70
   }
+
 
   oms_agent {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
