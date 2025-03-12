@@ -1,3 +1,13 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">=3.70"  # Ensures we use a supported version
+    }
+  }
+  required_version = ">= 1.3.0"
+}
+
 provider "azurerm" {
   features {}
 }
@@ -35,6 +45,15 @@ resource "azurerm_subnet" "aks_subnet" {
   }
 }
 
+# Log Analytics for AKS Monitoring (must be created before AKS)
+resource "azurerm_log_analytics_workspace" "aks" {
+  name                = "aks-log-workspace"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
+
 # AKS Cluster with Private Link
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
@@ -60,7 +79,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.0.0.10"
   }
 
-  # Correct way to enable private cluster
+  # Correct way to enable a private AKS cluster
   api_server_access_profile {
     private_cluster_enabled = true
   }
@@ -74,15 +93,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
   tags = {
     environment = "dev"
   }
-}
 
-# Log Analytics for AKS Monitoring
-resource "azurerm_log_analytics_workspace" "aks" {
-  name                = "aks-log-workspace"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
+  depends_on = [azurerm_log_analytics_workspace.aks]
 }
 
 output "aks_name" {
