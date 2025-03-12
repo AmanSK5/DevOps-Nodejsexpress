@@ -35,20 +35,6 @@ resource "azurerm_subnet" "aks_subnet" {
   }
 }
 
-# Private DNS Zone for AKS API Server
-resource "azurerm_private_dns_zone" "aks_dns" {
-  name                = "privatelink.westeurope.azmk8s.io"
-  resource_group_name = azurerm_resource_group.rg.name
-}
-
-# Private Link Service for AKS API Server
-resource "azurerm_private_dns_zone_virtual_network_link" "aks_dns_link" {
-  name                  = "aks-dns-link"
-  resource_group_name   = azurerm_resource_group.rg.name
-  private_dns_zone_name = azurerm_private_dns_zone.aks_dns.name
-  virtual_network_id    = azurerm_virtual_network.vnet.id
-}
-
 # AKS Cluster with Private Link
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
@@ -75,7 +61,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   api_server_access_profile {
-    private_cluster_enabled = true
+    enable_private_cluster = true
   }
 
   oms_agent {
