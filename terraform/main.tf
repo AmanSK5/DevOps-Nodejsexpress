@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.22.0"
+      version = "~> 4.0.0"
     }
   }
 }
@@ -80,7 +80,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   # ✅ Correct method for Private AKS in Terraform v4.x
   api_server_access_profile {
-    enable_private_cluster = true
+    private_cluster_enabled = true  # ✅ This is the correct field for Terraform v4.x
   }
 
   oms_agent {
