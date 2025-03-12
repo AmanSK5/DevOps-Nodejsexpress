@@ -53,7 +53,7 @@ resource "azurerm_log_analytics_workspace" "aks" {
   retention_in_days   = 30
 }
 
-# ✅ Create a Private AKS Cluster with Terraform v4.x
+# ✅ Create a Private AKS Cluster with Terraform v4.x+
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location
@@ -80,7 +80,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   # ✅ Correct method for Private AKS in Terraform v4.x+
   api_server_access_profile {
-    enable_private_cluster = true  # ✅ The correct field for private AKS
+    enable_private_cluster = true  # ✅ The correct field placement for private AKS
   }
 
   oms_agent {
