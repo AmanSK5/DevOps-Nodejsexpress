@@ -74,9 +74,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.0.0.10"
   }
 
+  # Private Cluster Configuration
   api_server_access_profile {
     enable_private_cluster = true
-    private_dns_zone       = "System"  # Use the default managed DNS
+    private_dns_zone_id    = azurerm_private_dns_zone.aks_dns.id
   }
 
   oms_agent {
