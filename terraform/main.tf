@@ -1,8 +1,5 @@
 provider "azurerm" {
   features {}
-
-  # Using the variable for subscription_id
-  subscription_id = var.subscription_id
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -77,10 +74,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.0.0.10"
   }
 
-  api_server_access_profile {
-    private_cluster_enabled = true  # Corrected field
-    private_dns_zone_id     = azurerm_private_dns_zone.aks_dns.id  # Use manually created DNS zone
-  }
+  private_cluster_enabled = true  # Moved out of `api_server_access_profile`
+  private_dns_zone        = "System"  # Use the default managed DNS
 
   oms_agent {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
