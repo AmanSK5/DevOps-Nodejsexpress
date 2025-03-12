@@ -60,9 +60,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
   dns_prefix          = "devopsaks"
 
   default_node_pool {
-    name       = "default"
-    node_count = var.node_count
-    vm_size    = var.vm_size
+    name           = "default"
+    node_count     = var.node_count
+    vm_size        = var.vm_size
     vnet_subnet_id = azurerm_subnet.aks_subnet.id  # Assign the subnet
   }
 
@@ -78,11 +78,11 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   api_server_access_profile {
-    enable_private_cluster = true
-    private_dns_zone_id    = azurerm_private_dns_zone.aks_dns.id
+    private_cluster_enabled = true  # Updated field
+    private_dns_zone        = "System" # Uses default private DNS management
   }
 
-  oms_agent {
+  monitoring_profile {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
   }
 
