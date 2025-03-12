@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.0.0"
+      version = "~> 4.0.0"  # Ensure latest 4.x.x provider
     }
   }
 }
@@ -13,28 +13,27 @@ provider "azurerm" {
   features {}
 }
 
-# ✅ Create a Resource Group
+# Create a Resource Group
 resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
   location = var.location
 }
 
-# ✅ Create a Virtual Network for Private AKS
+# Create a Virtual Network
 resource "azurerm_virtual_network" "vnet" {
   name                = var.vnet_name
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  address_space       = ["10.0.0.0/16"]
+  address_space       = var.vnet_address_space
 }
 
-# ✅ Create a Subnet for AKS
+# Create a Subnet for AKS
 resource "azurerm_subnet" "aks_subnet" {
   name                 = var.subnet_name
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.1.0/24"]
+  address_prefixes     = var.subnet_address_prefix
 
-  # Required for Private AKS clusters
   delegation {
     name = "aksdelegation"
     service_delegation {
@@ -44,7 +43,7 @@ resource "azurerm_subnet" "aks_subnet" {
   }
 }
 
-# ✅ Create Log Analytics Workspace (Required for Monitoring)
+# Log Analytics for Monitoring
 resource "azurerm_log_analytics_workspace" "aks" {
   name                = "aks-log-workspace"
   location            = azurerm_resource_group.rg.location
@@ -53,7 +52,7 @@ resource "azurerm_log_analytics_workspace" "aks" {
   retention_in_days   = 30
 }
 
-# ✅ Create a Private AKS Cluster with Terraform v4.x+
+# ✅ Correct way to deploy a **Private** AKS Cluster
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location
@@ -78,9 +77,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.0.0.10"
   }
 
-  # ✅ Correct method for Private AKS in Terraform v4.x+
+  # ✅ Correct Block for Enabling Private Cluster
   api_server_access_profile {
-    enable_private_cluster = true  # ✅ The correct field placement for private AKS
+    enable_private_cluster = true
   }
 
   oms_agent {
