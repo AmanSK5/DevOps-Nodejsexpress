@@ -44,21 +44,16 @@ resource "azurerm_subnet" "aks_subnet" {
   }
 }
 
-# ✅ Create Private DNS Zone (Recommended for Private AKS)
-resource "azurerm_private_dns_zone" "aks_dns" {
-  name                = "privatelink.westeurope.azmk8s.io"
+# ✅ Create Log Analytics Workspace (Required for Monitoring)
+resource "azurerm_log_analytics_workspace" "aks" {
+  name                = "aks-log-workspace"
+  location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
 }
 
-# ✅ Link Private DNS Zone to Virtual Network
-resource "azurerm_private_dns_zone_virtual_network_link" "aks_dns_link" {
-  name                  = "aks-dns-link"
-  resource_group_name   = azurerm_resource_group.rg.name
-  private_dns_zone_name = azurerm_private_dns_zone.aks_dns.name
-  virtual_network_id    = azurerm_virtual_network.vnet.id
-}
-
-# ✅ Create a Private AKS Cluster
+# ✅ Create a Private AKS Cluster with Terraform v4.x
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location
@@ -83,10 +78,13 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.0.0.10"
   }
 
-  # ✅ Correct method for Private AKS in Terraform v4.22.0
+  # ✅ Correct method for Private AKS in Terraform v4.x
   api_server_access_profile {
     enable_private_cluster = true
-    private_dns_zone_id    = azurerm_private_dns_zone.aks_dns.id
+  }
+
+  oms_agent {
+    log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
   }
 
   role_based_access_control_enabled = true
@@ -94,6 +92,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
   tags = {
     environment = "dev"
   }
+
+  depends_on = [azurerm_log_analytics_workspace.aks]
 }
 
 output "aks_name" {
