@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.70.0"
+      version = "~> 4.0.0"
     }
   }
 }
@@ -55,7 +55,7 @@ resource "azurerm_log_analytics_workspace" "aks" {
   retention_in_days   = 30
 }
 
-# AKS Private Cluster (Fixed for Terraform v3.70.0)
+# ✅ Private AKS Cluster (FIXED for Terraform 4.x.x)
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location
@@ -80,9 +80,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.0.0.10"
   }
 
-  # ✅ Corrected for Terraform v3.70.0
+  # ✅ This is the correct way to enable a private AKS cluster in Terraform 4.x.x
   api_server_access_profile {
-    private_cluster_enabled = true
+    enable_private_cluster = true
+    private_dns_zone_mode  = "System"
   }
 
   oms_agent {
