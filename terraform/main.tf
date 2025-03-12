@@ -70,7 +70,7 @@ resource "azurerm_log_analytics_workspace" "aks" {
   retention_in_days   = 30
 }
 
-# ✅ AKS Private Cluster
+# ✅ AKS Private Cluster (Corrected for Terraform v3.70)
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location
@@ -95,10 +95,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.0.0.10"
   }
 
-  # ✅ Private Cluster Enabled Correctly
+  # ✅ Corrected Private Cluster Configuration
   api_server_access_profile {
-    enable_private_cluster = true
-    private_dns_zone_id    = azurerm_private_dns_zone.aks_dns.id
+    private_cluster_enabled = true  # FIXED
   }
 
   oms_agent {
