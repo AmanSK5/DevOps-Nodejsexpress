@@ -11,6 +11,7 @@ terraform {
 
 provider "azurerm" {
   features {}
+  skip_provider_registration = true  # ✅ Prevents Terraform from failing due to missing providers
 }
 
 # Resource Group
