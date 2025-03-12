@@ -78,9 +78,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.0.0.10"
   }
 
-  # ✅ Correct method for Private AKS in Terraform v4.x
+  # ✅ Correct method for Private AKS in Terraform v4.x+
   api_server_access_profile {
-    private_cluster_enabled = true  # ✅ This is the correct field for Terraform v4.x
+    enable_private_cluster = true  # ✅ The correct field for private AKS
   }
 
   oms_agent {
