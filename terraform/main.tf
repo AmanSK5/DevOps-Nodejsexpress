@@ -83,7 +83,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   # ✅ Corrected API Server Profile
   api_server_access_profile {
-    enable_private_cluster = true  # Corrected for Terraform v3.70.0
+    private_cluster_enabled = true  # Corrected for Terraform v3.70.0
   }
 
   oms_agent {
