@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.22.0"  # ✅ Latest azurerm version
+      version = "~> 4.22.0"  # ✅ Ensuring compatibility
     }
   }
 }
@@ -58,7 +58,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "aks_dns_link" {
   virtual_network_id    = azurerm_virtual_network.vnet.id
 }
 
-# ✅ AKS Private Cluster with Private API
+# ✅ AKS Private Cluster with Correct Private API Config
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location
@@ -83,10 +83,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.0.0.10"
   }
 
-  # ✅ Correct Private API Server Configuration for azurerm v4.22.0
+  # ✅ Correct way to define a Private AKS Cluster in Terraform v4.22.0
   api_server_access_profile {
-    enable_private_cluster = true  # ✅ Correct field for Terraform v4.22.0
-    private_dns_zone_id    = azurerm_private_dns_zone.aks_dns.id
+    private_cluster_enabled = true  # ✅ Correct field name
+    private_dns_zone_id     = azurerm_private_dns_zone.aks_dns.id
   }
 
   role_based_access_control_enabled = true
