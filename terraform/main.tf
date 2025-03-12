@@ -60,8 +60,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip = "10.0.0.10"
   }
 
+  # Correct way to enable private cluster
   api_server_access_profile {
-    enable_private_cluster = true
+    private_cluster_enabled = true
   }
 
   oms_agent {
