@@ -1,0 +1,660 @@
+{
+  "version": 4,
+  "terraform_version": "1.11.2",
+  "serial": 240,
+  "lineage": "5b5946fb-016f-3ecc-7e41-b38c27c99d77",
+  "outputs": {
+    "aks_cluster_name": {
+      "value": "devops-aks-private-cluster",
+      "type": "string"
+    },
+    "aks_kube_config": {
+      "value": "az aks get-credentials --resource-group devops-aks-resource-group --name devops-aks-private-cluster",
+      "type": "string"
+    },
+    "resource_group": {
+      "value": "devops-aks-resource-group",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "azurerm_bastion_host",
+      "name": "bastion",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "copy_paste_enabled": true,
+            "dns_name": "bst-8a159032-914d-4663-8bc0-fa52d0f36e7a.bastion.azure.com",
+            "file_copy_enabled": false,
+            "id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/bastionHosts/devops-aks-bastion",
+            "ip_configuration": [
+              {
+                "name": "bastion-ip-config",
+                "public_ip_address_id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/publicIPAddresses/devops-aks-bastion-pip",
+                "subnet_id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/virtualNetworks/devops-aks-vnet/subnets/AzureBastionSubnet"
+              }
+            ],
+            "ip_connect_enabled": false,
+            "kerberos_enabled": false,
+            "location": "northeurope",
+            "name": "devops-aks-bastion",
+            "resource_group_name": "devops-aks-resource-group",
+            "scale_units": 2,
+            "session_recording_enabled": false,
+            "shareable_link_enabled": false,
+            "sku": "Basic",
+            "tags": {},
+            "timeouts": null,
+            "tunneling_enabled": false,
+            "virtual_network_id": "",
+            "zones": []
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAwLCJkZWxldGUiOjE4MDAwMDAwMDAwMDAsInJlYWQiOjMwMDAwMDAwMDAwMCwidXBkYXRlIjoxODAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "azurerm_public_ip.bastion_pip",
+            "azurerm_resource_group.rg",
+            "azurerm_subnet.bastion_subnet",
+            "azurerm_virtual_network.devops_aks_vnet"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_linux_virtual_machine",
+      "name": "devops_vm",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "additional_capabilities": [],
+            "admin_password": null,
+            "admin_ssh_key": [
+              {
+                "public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDAYFuBtT5JrTvevBumZPZlQEKSb6Sx7NKleqfewKXPp5BxZhWG5buSUz18Rs234KJyzPTrKrRPLdEVyO7ShnH06NxE57EyVhCbseXnuhFoXOGq7QpYG2Wk6em0eEwiQmVQ3u8o/Zq8RcK9iYyxzL5XsWoF8cMQNItOKS4QeJ1+rHal6kfEQO8VsNTxL2IbjHGMW5/ch/78+CvBfwB9vAlQOaEA4c1xqK0/eOb+rlnAjdN/aAtRSwCtYfAWV8qoHawD4KFmwYIcjvyn1Y4rqNkky2Kc0i1gqTc/Wh6DjBRXIFfA6+/HKxQtuHuAAofEt354ICzk7S8/Soi4vI/IBqTS1t1Dfsvecia4a6vWVyK828XYAW2WfAkw0ETXNCknJVIZ94IJQFVq1oH+GHnPjAQbN/k3SGpDaITDcCXQqGpRfeRCFc/WbRuO3g5tTVmFJai4Pa59lAnIpcxDUlqF+jSD/8rrU6RQMPRy2+XRI1OObBO7bX5SUECQwiRFvk+btkEhyTuh6BsDOk0blg3WJL/id4flkkK7glWapqDr8fCDem+xa2Dyg9SaD440HTIqmCUSbn6WF4WHVEU+S7cyMh0A3iVeOGkICqFgDxU+56Faqw+C/D3ycSY/UMbtUnE20ss3W8+mNnXe/YCsjJxdW9X7q7rItCib8oUgjOVh2SVU0w==\n",
+                "username": "azureuser"
+              }
+            ],
+            "admin_username": "azureuser",
+            "allow_extension_operations": true,
+            "availability_set_id": "",
+            "boot_diagnostics": [],
+            "bypass_platform_safety_checks_on_user_schedule_enabled": false,
+            "capacity_reservation_group_id": "",
+            "computer_name": "devops-aks-vm",
+            "custom_data": null,
+            "dedicated_host_group_id": "",
+            "dedicated_host_id": "",
+            "disable_password_authentication": true,
+            "disk_controller_type": "SCSI",
+            "edge_zone": "",
+            "encryption_at_host_enabled": false,
+            "eviction_policy": "",
+            "extensions_time_budget": "PT1H30M",
+            "gallery_application": [],
+            "id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Compute/virtualMachines/devops-aks-vm",
+            "identity": [],
+            "license_type": "",
+            "location": "northeurope",
+            "max_bid_price": -1,
+            "name": "devops-aks-vm",
+            "network_interface_ids": [
+              "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/networkInterfaces/devops-aks-vm-nic"
+            ],
+            "os_disk": [
+              {
+                "caching": "ReadWrite",
+                "diff_disk_settings": [],
+                "disk_encryption_set_id": "",
+                "disk_size_gb": 30,
+                "id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Compute/disks/devops-aks-vm_OsDisk_1_f9ddaa6e942349049460dc22f75ffeeb",
+                "name": "devops-aks-vm_OsDisk_1_f9ddaa6e942349049460dc22f75ffeeb",
+                "secure_vm_disk_encryption_set_id": "",
+                "security_encryption_type": "",
+                "storage_account_type": "Standard_LRS",
+                "write_accelerator_enabled": false
+              }
+            ],
+            "os_image_notification": [],
+            "patch_assessment_mode": "ImageDefault",
+            "patch_mode": "ImageDefault",
+            "plan": [],
+            "platform_fault_domain": -1,
+            "priority": "Regular",
+            "private_ip_address": "10.2.1.4",
+            "private_ip_addresses": [
+              "10.2.1.4"
+            ],
+            "provision_vm_agent": true,
+            "proximity_placement_group_id": "",
+            "public_ip_address": "",
+            "public_ip_addresses": [],
+            "reboot_setting": "",
+            "resource_group_name": "devops-aks-resource-group",
+            "secret": [],
+            "secure_boot_enabled": false,
+            "size": "Standard_B2s",
+            "source_image_id": "",
+            "source_image_reference": [
+              {
+                "offer": "0001-com-ubuntu-server-focal",
+                "publisher": "Canonical",
+                "sku": "20_04-lts-gen2",
+                "version": "latest"
+              }
+            ],
+            "tags": {},
+            "termination_notification": [],
+            "timeouts": null,
+            "user_data": "",
+            "virtual_machine_id": "04d15757-fab3-40c4-8568-f6af29a4fa95",
+            "virtual_machine_scale_set_id": "",
+            "vm_agent_platform_updates_enabled": false,
+            "vtpm_enabled": false,
+            "zone": ""
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "admin_password"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "custom_data"
+              }
+            ]
+          ],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoyNzAwMDAwMDAwMDAwLCJkZWxldGUiOjI3MDAwMDAwMDAwMDAsInJlYWQiOjMwMDAwMDAwMDAwMCwidXBkYXRlIjoyNzAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "azurerm_network_interface.devops_vm_nic",
+            "azurerm_resource_group.rg",
+            "azurerm_subnet.devops_aks_subnet",
+            "azurerm_virtual_network.devops_aks_vnet",
+            "tls_private_key.ssh_key"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_network_interface",
+      "name": "devops_vm_nic",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "accelerated_networking_enabled": false,
+            "applied_dns_servers": [],
+            "auxiliary_mode": "",
+            "auxiliary_sku": "",
+            "dns_servers": [],
+            "edge_zone": "",
+            "id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/networkInterfaces/devops-aks-vm-nic",
+            "internal_dns_name_label": "",
+            "internal_domain_name_suffix": "fj4a0eeepidufngbhl4ddagzqf.fx.internal.cloudapp.net",
+            "ip_configuration": [
+              {
+                "gateway_load_balancer_frontend_ip_configuration_id": "",
+                "name": "internal",
+                "primary": true,
+                "private_ip_address": "10.2.1.4",
+                "private_ip_address_allocation": "Dynamic",
+                "private_ip_address_version": "IPv4",
+                "public_ip_address_id": "",
+                "subnet_id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/virtualNetworks/devops-aks-vnet/subnets/devops-aks-subnet"
+              }
+            ],
+            "ip_forwarding_enabled": false,
+            "location": "northeurope",
+            "mac_address": "00-0D-3A-B6-9A-58",
+            "name": "devops-aks-vm-nic",
+            "private_ip_address": "10.2.1.4",
+            "private_ip_addresses": [
+              "10.2.1.4"
+            ],
+            "resource_group_name": "devops-aks-resource-group",
+            "tags": {},
+            "timeouts": null,
+            "virtual_machine_id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Compute/virtualMachines/devops-aks-vm"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAwLCJkZWxldGUiOjE4MDAwMDAwMDAwMDAsInJlYWQiOjMwMDAwMDAwMDAwMCwidXBkYXRlIjoxODAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "azurerm_resource_group.rg",
+            "azurerm_subnet.devops_aks_subnet",
+            "azurerm_virtual_network.devops_aks_vnet"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_network_security_group",
+      "name": "vm_nsg",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/networkSecurityGroups/devops-aks-vm-nsg",
+            "location": "northeurope",
+            "name": "devops-aks-vm-nsg",
+            "resource_group_name": "devops-aks-resource-group",
+            "security_rule": [
+              {
+                "access": "Allow",
+                "description": "",
+                "destination_address_prefix": "*",
+                "destination_address_prefixes": [],
+                "destination_application_security_group_ids": [],
+                "destination_port_range": "",
+                "destination_port_ranges": [
+                  "22"
+                ],
+                "direction": "Inbound",
+                "name": "AllowBastion",
+                "priority": 100,
+                "protocol": "Tcp",
+                "source_address_prefix": "VirtualNetwork",
+                "source_address_prefixes": [],
+                "source_application_security_group_ids": [],
+                "source_port_range": "*",
+                "source_port_ranges": []
+              }
+            ],
+            "tags": {},
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAwLCJkZWxldGUiOjE4MDAwMDAwMDAwMDAsInJlYWQiOjMwMDAwMDAwMDAwMCwidXBkYXRlIjoxODAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "azurerm_resource_group.rg"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_network_security_rule",
+      "name": "bastion_access",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "access": "Allow",
+            "description": "",
+            "destination_address_prefix": "*",
+            "destination_address_prefixes": [],
+            "destination_application_security_group_ids": [],
+            "destination_port_range": "",
+            "destination_port_ranges": [
+              "22"
+            ],
+            "direction": "Inbound",
+            "id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/networkSecurityGroups/devops-aks-vm-nsg/securityRules/AllowBastion",
+            "name": "AllowBastion",
+            "network_security_group_name": "devops-aks-vm-nsg",
+            "priority": 100,
+            "protocol": "Tcp",
+            "resource_group_name": "devops-aks-resource-group",
+            "source_address_prefix": "VirtualNetwork",
+            "source_address_prefixes": [],
+            "source_application_security_group_ids": [],
+            "source_port_range": "*",
+            "source_port_ranges": [],
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAwLCJkZWxldGUiOjE4MDAwMDAwMDAwMDAsInJlYWQiOjMwMDAwMDAwMDAwMCwidXBkYXRlIjoxODAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "azurerm_network_security_group.vm_nsg",
+            "azurerm_resource_group.rg"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_public_ip",
+      "name": "bastion_pip",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allocation_method": "Static",
+            "ddos_protection_mode": "VirtualNetworkInherited",
+            "ddos_protection_plan_id": null,
+            "domain_name_label": null,
+            "domain_name_label_scope": null,
+            "edge_zone": "",
+            "fqdn": null,
+            "id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/publicIPAddresses/devops-aks-bastion-pip",
+            "idle_timeout_in_minutes": 4,
+            "ip_address": "52.138.136.43",
+            "ip_tags": {},
+            "ip_version": "IPv4",
+            "location": "northeurope",
+            "name": "devops-aks-bastion-pip",
+            "public_ip_prefix_id": null,
+            "resource_group_name": "devops-aks-resource-group",
+            "reverse_fqdn": null,
+            "sku": "Standard",
+            "sku_tier": "Regional",
+            "tags": {},
+            "timeouts": null,
+            "zones": []
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAwLCJkZWxldGUiOjE4MDAwMDAwMDAwMDAsInJlYWQiOjMwMDAwMDAwMDAwMCwidXBkYXRlIjoxODAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "azurerm_resource_group.rg"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_resource_group",
+      "name": "rg",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group",
+            "location": "northeurope",
+            "managed_by": "",
+            "name": "devops-aks-resource-group",
+            "tags": {},
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo1NDAwMDAwMDAwMDAwLCJkZWxldGUiOjU0MDAwMDAwMDAwMDAsInJlYWQiOjMwMDAwMDAwMDAwMCwidXBkYXRlIjo1NDAwMDAwMDAwMDAwfX0="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_subnet",
+      "name": "bastion_subnet",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "address_prefixes": [
+              "10.2.2.0/27"
+            ],
+            "default_outbound_access_enabled": true,
+            "delegation": [],
+            "id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/virtualNetworks/devops-aks-vnet/subnets/AzureBastionSubnet",
+            "name": "AzureBastionSubnet",
+            "private_endpoint_network_policies": "Disabled",
+            "private_link_service_network_policies_enabled": true,
+            "resource_group_name": "devops-aks-resource-group",
+            "service_endpoint_policy_ids": [],
+            "service_endpoints": [],
+            "timeouts": null,
+            "virtual_network_name": "devops-aks-vnet"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAwLCJkZWxldGUiOjE4MDAwMDAwMDAwMDAsInJlYWQiOjMwMDAwMDAwMDAwMCwidXBkYXRlIjoxODAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "azurerm_resource_group.rg",
+            "azurerm_virtual_network.devops_aks_vnet"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_subnet",
+      "name": "devops_aks_subnet",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "address_prefixes": [
+              "10.2.1.0/24"
+            ],
+            "default_outbound_access_enabled": true,
+            "delegation": [
+              {
+                "name": "aksdelegation",
+                "service_delegation": [
+                  {
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/join/action"
+                    ],
+                    "name": "Microsoft.ContainerService/managedClusters"
+                  }
+                ]
+              }
+            ],
+            "id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/virtualNetworks/devops-aks-vnet/subnets/devops-aks-subnet",
+            "name": "devops-aks-subnet",
+            "private_endpoint_network_policies": "Disabled",
+            "private_link_service_network_policies_enabled": true,
+            "resource_group_name": "devops-aks-resource-group",
+            "service_endpoint_policy_ids": [],
+            "service_endpoints": [],
+            "timeouts": null,
+            "virtual_network_name": "devops-aks-vnet"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAwLCJkZWxldGUiOjE4MDAwMDAwMDAwMDAsInJlYWQiOjMwMDAwMDAwMDAwMCwidXBkYXRlIjoxODAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "azurerm_resource_group.rg",
+            "azurerm_virtual_network.devops_aks_vnet"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_subnet_network_security_group_association",
+      "name": "vm_subnet_nsg",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/virtualNetworks/devops-aks-vnet/subnets/devops-aks-subnet",
+            "network_security_group_id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/networkSecurityGroups/devops-aks-vm-nsg",
+            "subnet_id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/virtualNetworks/devops-aks-vnet/subnets/devops-aks-subnet",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAwLCJkZWxldGUiOjE4MDAwMDAwMDAwMDAsInJlYWQiOjMwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "azurerm_network_security_group.vm_nsg",
+            "azurerm_resource_group.rg",
+            "azurerm_subnet.devops_aks_subnet",
+            "azurerm_virtual_network.devops_aks_vnet"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_virtual_network",
+      "name": "devops_aks_vnet",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "address_space": [
+              "10.2.0.0/16"
+            ],
+            "bgp_community": "",
+            "ddos_protection_plan": [],
+            "dns_servers": [],
+            "edge_zone": "",
+            "encryption": [],
+            "flow_timeout_in_minutes": 0,
+            "guid": "100d7c2a-7a84-4207-b4c1-3afc3180d985",
+            "id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/virtualNetworks/devops-aks-vnet",
+            "location": "northeurope",
+            "name": "devops-aks-vnet",
+            "private_endpoint_vnet_policies": "Disabled",
+            "resource_group_name": "devops-aks-resource-group",
+            "subnet": [
+              {
+                "address_prefixes": [
+                  "10.2.1.0/24"
+                ],
+                "default_outbound_access_enabled": true,
+                "delegation": [
+                  {
+                    "name": "aksdelegation",
+                    "service_delegation": [
+                      {
+                        "actions": [
+                          "Microsoft.Network/virtualNetworks/subnets/join/action"
+                        ],
+                        "name": "Microsoft.ContainerService/managedClusters"
+                      }
+                    ]
+                  }
+                ],
+                "id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/virtualNetworks/devops-aks-vnet/subnets/devops-aks-subnet",
+                "name": "devops-aks-subnet",
+                "private_endpoint_network_policies": "Disabled",
+                "private_link_service_network_policies_enabled": true,
+                "route_table_id": "",
+                "security_group": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/networkSecurityGroups/devops-aks-vm-nsg",
+                "service_endpoint_policy_ids": [],
+                "service_endpoints": []
+              },
+              {
+                "address_prefixes": [
+                  "10.2.2.0/27"
+                ],
+                "default_outbound_access_enabled": true,
+                "delegation": [],
+                "id": "/subscriptions/19f6639e-1372-43e9-b92b-f6cbd3c85e24/resourceGroups/devops-aks-resource-group/providers/Microsoft.Network/virtualNetworks/devops-aks-vnet/subnets/AzureBastionSubnet",
+                "name": "AzureBastionSubnet",
+                "private_endpoint_network_policies": "Disabled",
+                "private_link_service_network_policies_enabled": true,
+                "route_table_id": "",
+                "security_group": "",
+                "service_endpoint_policy_ids": [],
+                "service_endpoints": []
+              }
+            ],
+            "tags": {},
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAwLCJkZWxldGUiOjE4MDAwMDAwMDAwMDAsInJlYWQiOjMwMDAwMDAwMDAwMCwidXBkYXRlIjoxODAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "azurerm_resource_group.rg"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "local_file",
+      "name": "private_key",
+      "provider": "provider[\"registry.terraform.io/hashicorp/local\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "content": "-----BEGIN RSA PRIVATE KEY-----\n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\n-----END RSA PRIVATE KEY-----\n",
+            "content_base64": null,
+            "content_base64sha256": "ypBzkoz2EKT+qvTSI8Q6exDMNDqCLkoi7lWRi8ucrV4=",
+            "content_base64sha512": "vKFdZzr2gZwKAa4zZZD629DTLARmqM8/ui8OPkuNo533bfVtDgl4SfnVexxrHSuIriFhVu1c2jA9/EyGsFc1zQ==",
+            "content_md5": "0cde454707ebe5e20589b1f50b1b224a",
+            "content_sha1": "c91adb2ed75ad0aba6a76810fa471ff66966f07a",
+            "content_sha256": "ca9073928cf610a4feaaf4d223c43a7b10cc343a822e4a22ee55918bcb9cad5e",
+            "content_sha512": "bca15d673af6819c0a01ae336590fadbd0d32c0466a8cf3fba2f0e3e4b8da39df76df56d0e097849f9d57b1c6b1d2b88ae216156ed5cda303dfc4c86b05735cd",
+            "directory_permission": "0777",
+            "file_permission": "0777",
+            "filename": "./id_rsa",
+            "id": "c91adb2ed75ad0aba6a76810fa471ff66966f07a",
+            "sensitive_content": null,
+            "source": null
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "content"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "sensitive_content"
+              }
+            ]
+          ],
+          "dependencies": [
+            "tls_private_key.ssh_key"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "tls_private_key",
+      "name": "ssh_key",
+      "provider": "provider[\"registry.terraform.io/hashicorp/tls\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "algorithm": "RSA",
+            "ecdsa_curve": "P224",
+            "id": "63c36a28009655acf9a23b233147160882483a73",
+            "private_key_openssh": "-----BEGIN OPENSSH PRIVATE KEY-----\n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\n-----END OPENSSH PRIVATE KEY-----\n",
+            "private_key_pem": "-----BEGIN RSA PRIVATE KEY-----\n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\n-----END RSA PRIVATE KEY-----\n",
+            "private_key_pem_pkcs8": "-----BEGIN PRIVATE KEY-----\n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\n5nRLUfdOsWGAwGqV3/kzvfgHQHgPKg==\n-----END PRIVATE KEY-----\n",
+            "public_key_fingerprint_md5": "09:24:ef:48:a8:50:cf:31:5f:ff:a9:05:26:9b:70:ee",
+            "public_key_fingerprint_sha256": "SHA256:vSwrvvMiYGtFGcaphVKlClVBN/CUS0CEs3WsEDne8hk",
+            "public_key_openssh": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDAYFuBtT5JrTvevBumZPZlQEKSb6Sx7NKleqfewKXPp5BxZhWG5buSUz18Rs234KJyzPTrKrRPLdEVyO7ShnH06NxE57EyVhCbseXnuhFoXOGq7QpYG2Wk6em0eEwiQmVQ3u8o/Zq8RcK9iYyxzL5XsWoF8cMQNItOKS4QeJ1+rHal6kfEQO8VsNTxL2IbjHGMW5/ch/78+CvBfwB9vAlQOaEA4c1xqK0/eOb+rlnAjdN/aAtRSwCtYfAWV8qoHawD4KFmwYIcjvyn1Y4rqNkky2Kc0i1gqTc/Wh6DjBRXIFfA6+/HKxQtuHuAAofEt354ICzk7S8/Soi4vI/IBqTS1t1Dfsvecia4a6vWVyK828XYAW2WfAkw0ETXNCknJVIZ94IJQFVq1oH+GHnPjAQbN/k3SGpDaITDcCXQqGpRfeRCFc/WbRuO3g5tTVmFJai4Pa59lAnIpcxDUlqF+jSD/8rrU6RQMPRy2+XRI1OObBO7bX5SUECQwiRFvk+btkEhyTuh6BsDOk0blg3WJL/id4flkkK7glWapqDr8fCDem+xa2Dyg9SaD440HTIqmCUSbn6WF4WHVEU+S7cyMh0A3iVeOGkICqFgDxU+56Faqw+C/D3ycSY/UMbtUnE20ss3W8+mNnXe/YCsjJxdW9X7q7rItCib8oUgjOVh2SVU0w==\n",
+            "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAwGBbgbU+Sa073rwbpmT2\nZUBCkm+ksezSpXqn3sClz6eQcWYVhuW7klM9fEbNt+Cicsz06yq0Ty3RFcju0oZx\n9OjcROexMlYQm7Hl57oRaFzhqu0KWBtlpOnptHhMIkJlUN7vKP2avEXCvYmMscy+\nV7FqBfHDEDSLTikuEHidfqx2pepHxEDvFbDU8S9iG4xxjFuf3If+/PgrwX8AfbwJ\nUDmhAOHNcaitP3jm/q5ZwI3Tf2gLUUsArWHwFlfKqB2sA+ChZsGCHI78p9WOK6jZ\nJMtinNItYKk3P1oeg4wUVyBXwOvvxysULbh7gAKHxLd+eCAs5O0vP0qIuLyPyAak\n0tbdQ37L3nImuGur1lcivNvF2AFtlnwJMNBE1zQpJyVSGfeCCUBVataB/hh5z4wE\nGzf5N0hqQ2iEw3Al0KhqUX3kQhXP1m0bjt4ObU1ZhSWouD2ufZQJyKXMQ1Jahfo0\ng//K61OkUDD0ctvl0SNTjmwTu21+UlBAkMIkRb5Pm7ZBIck7oegbAzpNG5YN1iS/\n4neH5ZJCu4JVmqag6/Hwg3pvsWtg8oPUmg+ONB0yKpglEm5+lheFh1RFPku3MjId\nAN4lXjhpCAqhYA8VPuehWqsPgvw98nEmP1DG7VJxNtLLN1vPpjZ13v2ArIycXVvV\n+6u6yLQom/KFIIzlYdklVNMCAwEAAQ==\n-----END PUBLIC KEY-----\n",
+            "rsa_bits": 4096
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "private_key_openssh"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "private_key_pem_pkcs8"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "private_key_pem"
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

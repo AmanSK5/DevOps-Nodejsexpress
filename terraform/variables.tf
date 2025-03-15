@@ -18,49 +18,17 @@ variable "resource_group_name" {
 variable "aks_cluster_name" {
   description = "Name of the AKS Cluster"
   type        = string
-  default     = "devops-aks-private-cluster"  # Updated for private cluster
+  default     = "devops-aks-cluster"  # Default value, can be overridden in terraform.tfvars
 }
 
 variable "node_count" {
   description = "Number of nodes in the AKS cluster"
   type        = number
-  default     = 2  # Default value, can be overridden in terraform.tfvars
+  default     = 1  # Default value, can be overridden in terraform.tfvars
 }
 
 variable "vm_size" {
   description = "VM size for the AKS nodes"
   type        = string
   default     = "Standard_DS2_v2"  # Default VM size, can be overridden in terraform.tfvars
-}
-
-# Virtual Network and Subnet for Private AKS
-variable "vnet_name" {
-  description = "Name of the Virtual Network"
-  type        = string
-  default     = "aks-vnet"
-}
-
-variable "vnet_address_space" {
-  description = "CIDR block for the Virtual Network"
-  type        = list(string)
-  default     = ["10.0.0.0/16"]
-}
-
-variable "subnet_name" {
-  description = "Name of the AKS Subnet"
-  type        = string
-  default     = "aks-subnet"
-}
-
-variable "subnet_address_prefix" {
-  description = "CIDR block for the AKS subnet"
-  type        = list(string)
-  default     = ["10.0.1.0/24"]
-}
-
-# Private DNS Zone for Private AKS Cluster
-variable "private_dns_zone_name" {
-  description = "Private DNS Zone Name for Private Link"
-  type        = string
-  default     = "privatelink.westeurope.azmk8s.io"
 }
