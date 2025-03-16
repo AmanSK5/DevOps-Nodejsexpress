@@ -16,7 +16,7 @@ stages:
     jobs:
       - job: Build
         pool:
-          vmImage: ubuntu-latest  # Uses Ubuntu as the build agent
+          name: private-agent-pool  # Uses the self-hosted agent
         steps:
           - checkout: self  # Checks out the repository
 
@@ -35,13 +35,13 @@ stages:
     jobs:
       - job: LintAndScan
         pool:
-          vmImage: ubuntu-latest  # Uses Ubuntu as the build agent
+          name: private-agent-pool  # Uses the self-hosted agent
         steps:
           - checkout: self  # Ensures the repo is checked out
 
           - script: |
               echo "Checking repo structure..."
-              ls -R /home/vsts/work/1/s/
+              ls -R /home/azureuser/work/1/s/
             displayName: "List all repo files"
 
           - script: |
@@ -77,7 +77,7 @@ stages:
       - deployment: DeployToAKS
         environment: aks-nodejs  # Uses Azure DevOps environment for AKS
         pool:
-          vmImage: ubuntu-latest
+          name: private-agent-pool  # Uses the self-hosted agent
         strategy:
           runOnce:
             deploy:
@@ -106,7 +106,7 @@ stages:
 
                 - script: |
                     echo "Listing files in the repository..."
-                    ls -R /home/vsts/work/1/s/
+                    ls -R /home/azureuser/work/1/s/
                   displayName: 'List all files in the repository'
 
                 - script: |
