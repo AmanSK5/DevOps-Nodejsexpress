@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/amansk5/nodejs-api
-  tag: "{{ .Chart.AppVersion }}"  # Uses Helm's Chart versioning
+  tag: "latest"  # Uses Helm's Chart versioning
   pullPolicy: Always  # Ensures the image is always pulled
 
 resources:
