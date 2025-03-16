@@ -15,8 +15,6 @@ resources:
 
 service:
   type: LoadBalancer
-  annotations:
-    service.beta.kubernetes.io/azure-load-balancer-internal: "true"  # Makes LoadBalancer private
   port: 3000
 
 containerPort: 3000
