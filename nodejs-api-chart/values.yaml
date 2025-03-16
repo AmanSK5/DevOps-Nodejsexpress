@@ -15,6 +15,8 @@ resources:
 
 service:
   type: LoadBalancer
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"  # Make LoadBalancer Private
   port: 3000
 
 containerPort: 3000
@@ -28,7 +30,7 @@ serviceAccount:
   create: false
 
 ingress:
-  enabled: false  # Change to true if you want to enable ingress
+  enabled: false  # Keep false for now, we will use VPN instead
   className: "nginx"
   annotations: {}
   hosts:
