@@ -16,7 +16,7 @@ stages:
     jobs:
       - job: Build
         pool:
-          name: private-agent-pool  # Uses the self-hosted agent
+          name: private-agent-pool  # Uses the self-hosted agent in devops
         steps:
           - checkout: self  # Checks out the repository
 
