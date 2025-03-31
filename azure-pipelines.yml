@@ -41,7 +41,7 @@ stages:
 
           - script: |
               echo "Checking repo structure..."
-              ls -R /home/azureuser/work/1/s/
+              ls -R $(Build.SourcesDirectory)  # Updated to use the correct repo path
             displayName: "List all repo files"
 
           - script: |
@@ -106,7 +106,7 @@ stages:
 
                 - script: |
                     echo "Listing files in the repository..."
-                    ls -R /home/azureuser/work/1/s/
+                    ls -R $(Build.SourcesDirectory)  # Updated to use the correct repo path
                   displayName: 'List all files in the repository'
 
                 - script: |
