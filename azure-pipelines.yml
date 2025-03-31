@@ -77,7 +77,7 @@ stages:
       - deployment: DeployToAKS
         environment: aks-nodejs  # Uses Azure DevOps environment for AKS
         pool:
-          name: private-agent-pool  # Uses the self-hosted agent
+          name: private-agent-pool  # Uses the self-hosted agent that was deployed in AZ Devops
         strategy:
           runOnce:
             deploy:
